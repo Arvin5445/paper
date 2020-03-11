@@ -18,29 +18,51 @@
 
 1. 开发所用设备和软件
 
-**MacBook Pro (13-inch, 2018)**
++ **硬件**
 
-> macOS Catalina 10.15.3
->
-> 2.3 GHz 四核Intel Core i5
->
-> 8 GB 2133 MHz LPDDR3
->
-> Intel Iris Plus Graphics 655 1536 MB
+    **MacBook Pro (13-inch, 2018)**
 
-**腾讯云主机 (标准型S2)**
+    > **系统** macOS Catalina 10.15.3
+    >
+    > **CPU** 2.3 GHz 四核Intel Core i5
+    >
+    > **内存** 8 GB 2133 MHz LPDDR3
+    >
+    > **磁盘** Macintosh HD
 
->Ubuntu 16.04.1 LTS
->
->1核 2GB 1Mbps
->
->系统盘：高性能云硬盘
+    **腾讯云主机 (标准型S2 1Mbps)**
+
+    >**系统** Ubuntu 16.04.1 LTS
+    >
+    >**CPU** 1核 
+    >
+    >**内存** 2GB
+    >
+    >**磁盘** 高性能云硬盘
+
++ **软件**
+
+  > **JDK** 1.8.0_231
+  >
+  > **Tomcat** 8.5.50
+  >
+  > **MySQL** 5.7
+  >
+  > **IntelliJ IDEA** 2019.3.2
+  >
+  > **Navicat Premium** 15.0.8
+  >
+  > **Spring** 4.2.23
+  >
+  > **MyBatis** 3.3.0
+
+  
 
 1. 执行与构建
 
 项目基于SpringMVC和Maven构建
 
-在Tomcat 8.5.50 执行
+在 Ubuntu 16.04.1 LTS 下的基于 JDK 1.8.0_231 的 Tomcat 8.5.50 执行
 
 ## （四）技术路线
 
@@ -68,7 +90,7 @@
     + jquery
     + bootstrap
 
-1. 项目依赖
+1. 项目依赖==注释没写==
 
 ```xml
 <dependency>
@@ -243,7 +265,7 @@
 
 1. 项目结构
 
-```powershell
+```
 arvinclub-blog
 ├── README.md
 ├── blog-model
@@ -292,7 +314,11 @@ arvinclub-blog
 │   │   │   │               └── service
 │   │   │   │                   ├── BlogService.java
 │   │   │   │                   ├── CommentService.java
-│   │   │   │                   └── UserService.java
+│   │   │   │                   ├── UserService.java
+│   │   │   │                   └── impl
+│   │   │   │                       ├── BlogServiceImpl.java
+│   │   │   │                       ├── CommentServiceImpl.java
+│   │   │   │                       └── UserServiceImpl.java
 │   │   │   └── resources
 │   │   │       ├── database.properties
 │   │   │       ├── log4j.properties
@@ -430,7 +456,7 @@ arvinclub-blog
 
 ## （六）主要研究内容
 
-微博系统设计
+微博系统设计，保证一个高可用的微博网络社交平台
 
 
 
@@ -479,17 +505,19 @@ arvinclub-blog
 
 1. 设计maven的模块结构和依赖关系
 
-项目分为三个模块
+    项目分为三个模块：
 
-> **blog-model** 负责数据、实体、模型
->
-> **blog-service** 封装可复用的、高可用的业务操作
->
-> **blog-web** 负责解析视图，进行页面的渲染（SpringMVC直接与这一层交互）
+    > **blog-model** 负责数据、实体、模型
+    >
+    > **blog-service** 封装可复用的、高可用的业务操作
+    >
+    > **blog-web** 负责解析视图，进行页面的渲染（SpringMVC直接与这一层交互）
 
-1. 完成SpringMVC（基于注解）的搭建
+2. 完成 `SpringMVC`（基于注解）的搭建
 
-扩展AbstractAnnotationConfigDispatcherServletInitializer类会自动配置DispatcherServlet和Spring应用上下文
+    本项目基于 `Web 3.0` 抛弃了基于繁琐的 `web.xml` 的形式的旧版，使用更加方便，快捷，现代 `SpringMVC` 类库中提供的现有类来配置 `DispacherServlet`
+
+    扩展AbstractAnnotationConfigDispatcherServletInitializer类会自动配置DispatcherServlet和Spring应用上下文
 
 ```java
 /**
@@ -534,7 +562,76 @@ public class BlogWebAppInitializer extends AbstractAnnotationConfigDispatcherSer
 
 
 
-1. 完成三层架构的搭建
+3. 完成三层架构的搭建
+
+   + Controller 
+
+     1. DispacherServlet收到发送的HttpServletRequest，调用HandlerMapping处理器映射器。
+2. 处理器映射器找到具体的处理器(可以根据xml配置、注解进行查找)，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet。
+     3. DispatcherServlet调用HandlerAdapter处理器适配器。
+4. HandlerAdapter经过适配调用具体的处理器(Controller，也叫后端控制器)。
+     5. Controller执行完成返回ModelAndView。
+
+     业务模块流程。我经常喜欢用控制视图的跳转来简单形容，但是这个是不全面的，因为他除了控制视图的转换之外，还控制了业务的逻辑，但是，这里的控制业务逻辑不是业务逻辑的实现，而仅仅是一个大的模块，你看到之后，知道它实现了这个业务逻辑，但是怎么实现的，不需要关心，仅仅需要调用service层里的一个方法即可，这样使controller层看起来更加清晰。
+
+     controller层负责具体的业务模块流程的控制，在此层要调用service层的接口来控制业务流程，控制的配置也同样是在Spring的配置文件里进行，针对具体的业务流程，会有不同的控制器。我们具体的设计过程可以将流程进行抽象归纳，设计出可以重复利用的子单元流程模块。这样不仅使程序结构变得清晰，也大大减少了代码量。
+     
+     ```
+     controller
+     ├── admin
+     │   └── AdminController.java
+     ├── blog
+     │   ├── BlogsController.java
+     │   └── CommentController.java
+     ├── error
+     │   └── ErrorController.java
+     ├── fun
+     │   ├── PageController.java
+     │   ├── RredirectController.java
+     │   └── SearchController.java
+     ├── other
+     │   └── DownloadController.java
+     └── user
+         ├── AttentionController.java
+         ├── LoginController.java
+         └── RegisteController.java
+     ```
+     
+     
+     
+   + Service
+   
+     封装了一系列的可复用的业务操作业务
+   
+     service层主要负责业务模块的应用逻辑应用设计。同样是首先设计接口，再设计其实现类，接着再Sprin
+   
+     的配置文件中配置其实现的关联。这样我们就可以在应用中调用service接口来进行业务处理。service层
+   
+     的业务实，具体要调用已经定义的dao层接口，封装service层业务逻辑有利于通用的业务逻辑的独立性和
+   
+     重复利用性。程序显得非常简洁。
+   
+     ```
+     service
+     ├── config
+     │   ├── GetHttpSessionConfigurator.java
+     │   ├── RootConfig.java
+     │   └── WebSocket.java
+     ├── dao
+     │   ├── BlogDao.java
+     │   ├── CommentDao.java
+     │   └── UserDao.java
+     └── service
+         ├── BlogService.java
+         ├── CommentService.java
+         ├── UserService.java
+         └── impl
+             ├── BlogServiceImpl.java
+             ├── CommentServiceImpl.java
+             └── UserServiceImpl.java
+     ```
+   
+     
 
 ## （二）数据库持久化
 
