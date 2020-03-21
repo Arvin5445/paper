@@ -90,7 +90,7 @@
     + jquery
     + bootstrap
 
-1. 项目依赖==注释没写==
+1. 项目依赖==填充内容注释没写==
 
 ```xml
 <dependency>
@@ -458,9 +458,13 @@ arvinclub-blog
 
 微博系统设计，保证一个高可用的微博网络社交平台
 
+==填充内容==
+
 
 
 # 二．开发技术介绍
+
+
 
 ## （一）Maven简介
 
@@ -528,17 +532,229 @@ Spring 4.x开始，Spring MVC基于Servlet 3.0 开发，并且为了方便Restfu
 
 
 
+### 简介
+
+Java Web 是用 Java 技术来解决相关 web 互联网领域的技术总和。
+Web 包括：web 服务器和 web 客户端两部分。
+Java 在客户端的应用有 java applet，使用得很少，Java 在服务器端的应用非常丰富，比如 Servlet，JSP 和第三方框架等等。
+
+1. C/S 体系结构
+    （1）概念
+
+  ​			C/S 是 Client/Server 的缩写，即客户端 / 服务器结构。
+
+  	（2）特点
+
+  			这种结构可以充分利用两端硬件环境的优势，将任务合理分配到客户端和服务器，从而降低了系统的通信		开销。同时安全性较高。
+
+3. B/S 体系结构
+    （1）概念
+
+  ​		B/S 是 Browser/Server 的缩写，即 浏览器/ 服务器结构。统一采用如 IE、Firefox、Chrome 等浏览器，通过 Web 浏览器向 Web 服务器发送请求，由 Web 服务器进行处理，并将处理结果逐级传回客户端。
+
+​		（2）特点
+
+​				节约了开发成本，是一种全新的软件体系结构。这种体系结构已经成为当今应用软件的首选体系结构。		安全性相对C/S较低。
+
+
+
+### Servlet
+
+​		类路径：`javax.servlet.HttpServlet`
+
+​		Servlet是一种独立于平台和协议的服务器端的Java应用程序，可以生成动态的web页面。它担当Web浏览器或其他http客户程序发出请求、与http服务器上的数据库或应用程序之间交互的中间层。
+
+​		Servlet是用Java编写的Server端程序，它与协议和平台无关。Servlet运行于Java服务器中。
+
+​		Java Servlet可以动态地扩展服务器的能力，并采用请求-响应模式提供Web服务。
+
+​		Servlet是使用Java Servlet应用程序设计接口及相关类和方法的Java程序。它在Web服务器上或应用服务器上运行并扩展了该服务器的能力。Servlet装入Web服务器并在Web服务器内执行。
+
+​		Servlet是以Java技术为基础的服务器端应用程序组件，Servlet的客户端可以提出请求并获得该请求的响应，它可以是任何Java程序、浏览器或任何设备。
+
+​		当Web服务器接收到一个HTTP请求时，它会先判断请求内容——如果是静态网页数据，Web服务器将会自行处理，然后产生响应信息；如果牵涉到动态数据，Web服务器会将请求转交给Servlet容器。此时Servlet容器会找到对应的处理该请求的Servlet实例来处理，结果会送回Web服务器，再由Web服务器传回用户端。
+
+​		针对同一个Servlet，Servlet容器会在第一次收到http请求时建立一个Servlet实例，然后启动一个线程。第二次收到http请求时，Servlet容器无须建立相同的Servlet实例，而是启动第二个线程来服务客户端请求。所以多线程方式不但可以提高Web应用程序的执行效率，也可以降低Web服务器的系统负担。
+
+
+
+### JSP（JavaServer Pages）
+
+​		类路径：`javax.servlet.jsp`
+
+​		JSP和Servlet的本质是一样的，因为JSP最终需要编译成Servlet才能运行，换句话说JSP是生成Servler的草稿文件。
+
+​		JSP就是在HTML中嵌入Java代码，或者使用JSP标签，包括使用用户自定义标签，从而可以动态的提供内容。早起JSP应用比较广泛，一个web应用可以全部由JSP页面组成，只需要少量的JavaBean即可，但是这样导致了JSP职责过于复杂，这是Java EE标准的出现无疑是雪中送炭，因此JSP慢慢发展成单一的表现技术，不再承担业务逻辑组件以及持久层组件的责任。
+
+原理概述：
+
+​		JSP的本质是servlet，当用户指定servlet发送请求时，servlet利用输出流动态生成HTML页面。由于包含大量的HTML标签。静态文本等格式导致servlet的开发效率极低，所有的表现逻辑，包括布局、色彩及图像等，都必须耦合在Java代码中，起静态的部分无需Java程序控制，只有那些需要从数据库读取或者需要动态生成的页面内容才使用Java脚本控制。
+
+因此，JSP页面内容有以下两部分组成：
+
++ 静态部分：HTML标签
+
++ 动态部分：Java脚本
+
+
+
 # 三．原型设计
+
+
 
 ## （一）整体架构设计
 
+项目依据MVC架构，数据模型、视图渲染、处理器处理业务逻辑相互分离，低耦合，高内聚。
 
 
-## （二）主要内容
+
+## （二）数据库设计
+
+依据系统功能实现需求，数据库设计如下：
+
+### 用户：
+
+属性：
+
++ 用户ID：user_id
++ 用户名：user_name
++ 用户密码：user_password
++ 禁言截止日期：user_date
++ 启用状态：status
++ 权限：admin
++ 禁言状态：muted
+
+表设计：
+
+```mysql
+CREATE TABLE `user` (
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_password` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_date` datetime DEFAULT NULL COMMENT '禁言截止日期，muted为1时才有效',
+  `status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常，0停用',
+  `admin` int(2) NOT NULL DEFAULT '0' COMMENT '管理员权限',
+  `muted` int(2) NOT NULL DEFAULT '0' COMMENT '1禁言，0正常',
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+```
+
+实体属性图
+
+<img src="/Users/arvin/Documents/Documents/学校/毕设/images/用户.png" alt="用户" style="zoom:50%;" />
+
+### 博客：
+
+属性：
+
++ 博客ID：blog_id
++ 博客内容：blog_content
++ 发布时间：blog_time
++ 发布者用户ID：user_id
++ 图片文件名：filenames
++ 状态：status
+
+表设计：
+
+```mysql
+CREATE TABLE `blogs` (
+  `blog_id` int(11) NOT NULL AUTO_INCREMENT,
+  `blog_content` varchar(127) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '内容',
+  `blog_time` datetime DEFAULT NULL COMMENT '发布时间',
+  `user_id` int(11) DEFAULT NULL COMMENT '用户',
+  `filenames` varchar(510) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '图片的文件名',
+  `status` int(2) NOT NULL DEFAULT '1' COMMENT '1正常，0不展示',
+  PRIMARY KEY (`blog_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `blogs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+```
+
+实体属性图：
+
+<img src="/Users/arvin/Documents/Documents/学校/毕设/images/博客.png" alt="博客" style="zoom:50%;" />
+
+### 评论：
+
+属性：
+
++ 评论ID：comment_id
++ 所属博客ID：blog_id
++ 评论者用户ID：user_id
++ 评论内容：comment_content
++ 发布评论时间：comment_time
++ 状态：status
+
+表设计：
+
+```mysql
+CREATE TABLE `comment` (
+  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `blog_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `comment_content` varchar(127) NOT NULL,
+  `comment_time` datetime DEFAULT NULL,
+  `status` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`comment_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+```
+
+实体属性图：
+
+<img src="/Users/arvin/Documents/Documents/学校/毕设/images/评论.png" alt="评论" style="zoom:50%;" />
+
+### 关注：
+
+属性：
+
++ 关注ID：attention_id
++ 博主用户ID：blogger_id
++ 粉丝用户ID：fans_id
++ 状态：status
+
+表设计：
+
+```mysql
+CREATE TABLE `attention` (
+  `attention_id` int(11) NOT NULL AUTO_INCREMENT,
+  `blogger_id` int(11) NOT NULL,
+  `fans_id` int(11) NOT NULL,
+  `status` int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`attention_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+```
+
+实体属性图：
+
+<img src="/Users/arvin/Documents/Documents/学校/毕设/images/关注.png" alt="关注" style="zoom:50%;" />
+
+
+
+### 实体关系图
+
+![实体关系图](/Users/arvin/Documents/Documents/学校/毕设/images/实体关系图.png)
+
+
+
+## （三）主要内容
 
 1. 设计模型
 
-2. 三层架构搭建
++ Spring的工厂模式：BeanFactory
+
++ Spring的代理模式：使用了JDK中的动态代理 ` java.reflect.Proxy`
+
++ DataSouce的工厂模式：SqlSessionFactory
+
++ MyBatis的代理模式：面向接口编程，自动生成Mapper的实现
+
+1. 三层架构搭建
+
++ Controller：控制层，主要用作校验参数，接收参数，传递给service层并且返回结果，Controller层负责具体的业务模块流程的控制，在此层里面要调用Serice层的接口来控制业务流程，控制的配置也同样是在Spring的配置文件里面进行，针对具体的业务流程，会有不同的控制器，我们具体的设计过程中可以将流程进行抽象归纳，设计出可以重复利用的子单元流程模块，这样不仅使程序结构变得清晰，也大大减少了代码量。
++ Service：Service层主要负责业务模块的逻辑应用设计。同样是首先设计接口，再设计其实现的类，接着再Spring的配置文件中配置其实现的关联。这样我们就可以在应用中调用Service接口来进行业务处理。Service层的业务实现，具体要调用到已定义的DAO层的接口，封装Service层的业务逻辑有利于通用的业务逻辑的独立性和重复利用性，程序显得非常简洁。
++ Dao：DAO层主要是做数据持久层的工作，负责与数据库进行联络的一些任务都封装在此，DAO层的设计首先是设计DAO的接口，然后在Spring的配置文件中定义此接口的实现类，然后就可在模块中调用此接口来进行数据业务的处理，而不用关心此接口的具体实现类是哪个类，显得结构非常清晰，DAO层的数据源配置，以及有关数据库连接的参数都在Spring的配置文件中进行配置。
+
+各个层之间只能单向调用，禁止逆向调用。
 
 
 
@@ -611,7 +827,7 @@ public class BlogWebAppInitializer extends AbstractAnnotationConfigDispatcherSer
 
      1. DispacherServlet收到发送的HttpServletRequest，调用HandlerMapping处理器映射器。
 2. 处理器映射器找到具体的处理器(可以根据xml配置、注解进行查找)，生成处理器对象及处理器拦截器(如果有则生成)一并返回给DispatcherServlet。
-     
+   
      3. DispatcherServlet调用HandlerAdapter处理器适配器。
 4. HandlerAdapter经过适配调用具体的处理器(Controller，也叫后端控制器)。
      5. Controller执行完成返回ModelAndView。
@@ -645,7 +861,7 @@ public class BlogWebAppInitializer extends AbstractAnnotationConfigDispatcherSer
      
    + Service
    
-     封装了一系列的可复用的业务操作业务
+     封装了一系列的可复用的业务操作功能
    
      service层主要负责业务模块的应用逻辑应用设计。同样是首先设计接口，再设计其实现类，接着再Sprin
    
