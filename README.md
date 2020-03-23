@@ -517,12 +517,125 @@ Spring 4.x全面支持Java 8.0，支持Lambda表达式的使用，提供了对@S
 Spring 4.x还支持了基于Groovy DSL的配置，提高Bean配置的灵活性。
 
 Spring 4.x开始，Spring MVC基于Servlet 3.0 开发，并且为了方便Restful开发，引入了新的RestController注解器注解，同时还增加了一个AsyncRestTemplate支持Rest客户端的异步无阻塞请求。
+
+Spring框架为任何类型的部署平台上的基于Java的现代企业应用程序提供了全面的编程和配置模型。
+
+Spring的一个关键元素是在应用程序级别的基础架构支持：Spring专注于企业应用程序的“管道”，以便团队可以专注于应用程序级别的业务逻辑，而不必与特定的部署环境建立不必要的联系。
+
+支持政策和迁移
+
+有关最低要求的信息，有关从较早版本升级的指南以及支持政策，请查看[官方的Spring Framework Wiki页面。](https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-Versions)
+
+特征
+
+- [核心技术](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html)：依赖项注入，事件，资源，i18n，验证，数据绑定，类型转换，SpEL，AOP。
+- [测试](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/testing.html)：模拟对象，TestContext框架，Spring MVC测试，`WebTestClient`。
+- [数据访问](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/data-access.html)：事务，DAO支持，JDBC，ORM，封送XML。
+- [Spring MVC](https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html)和 [Spring WebFlux](https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html) Web框架。
+- [集成](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/integration.html)：远程处理，JMS，JCA，JMX，电子邮件，任务，调度，缓存。
+- [语言](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/languages.html)：Kotlin，Groovy，动态语言。
+
 1. 国内外现状
+
+   国内外都有无数知名Java项目通过maven构建，并托管在GitHub平台
+
+### IOC
+
+本章介绍了控制反转（IoC）原理的Spring框架实现。IoC也称为依赖注入（DI）。在此过程中，对象仅通过构造函数参数，工厂方法的参数或在构造或从工厂方法返回后在对象实例上设置的属性来定义其依赖项（即，与它们一起使用的其他对象） 。然后，容器在创建bean时注入那些依赖项。此过程从根本上讲是通过使用类的直接构造或诸如服务定位器模式之类的机制来控制其依赖项的实例化或位置的bean本身的逆过程（因此称为Control Inversion）。
+
+在`org.springframework.beans`和`org.springframework.context`包是Spring框架的IoC容器的基础。该 [`BeanFactory`](https://docs.spring.io/spring-framework/docs/5.2.4.RELEASE/javadoc-api/org/springframework/beans/factory/BeanFactory.html) 界面提供了一种高级配置机制，能够管理任何类型的对象。 [`ApplicationContext`](https://docs.spring.io/spring-framework/docs/5.2.4.RELEASE/javadoc-api/org/springframework/context/ApplicationContext.html) 是的子接口`BeanFactory`。它增加了：
+
+- 与Spring的AOP功能轻松集成
+- 消息资源处理（用于国际化）
+- 活动发布
+- 应用层特定的上下文，例如`WebApplicationContext` 用于Web应用程序中的。
+
+简而言之，`BeanFactory`提供了配置框架和基本功能，并`ApplicationContext`增加了更多针对企业的功能。该`ApplicationContext`是对一个完整的超集`BeanFactory`，并在Spring的IoC容器的描述本章独占使用。有关使用的详细信息`BeanFactory`，而不是`ApplicationContext,`看到 [的`BeanFactory`](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#beans-beanfactory)。
+
+在Spring中，构成应用程序主干并由Spring IoC容器管理的对象称为bean。Bean是由Spring IoC容器实例化，组装和以其他方式管理的对象。否则，bean仅仅是应用程序中许多对象之一。Bean及其之间的依赖关系反映在容器使用的配置元数据中。
+
+1.2 容器概述
+
+该`org.springframework.context.ApplicationContext`接口代表Spring IoC容器，并负责实例化，配置和组装Bean。容器通过读取配置元数据来获取有关要实例化，配置和组装哪些对象的指令。配置元数据以XML，Java批注或Java代码表示。它使您能够表达组成应用程序的对象以及这些对象之间的丰富相互依赖关系。
+
+`ApplicationContext`Spring提供了该接口的几种实现。在独立应用程序中，通常创建[`ClassPathXmlApplicationContext`](https://docs.spring.io/spring-framework/docs/5.2.4.RELEASE/javadoc-api/org/springframework/context/support/ClassPathXmlApplicationContext.html) 或的实例 [`FileSystemXmlApplicationContext`](https://docs.spring.io/spring-framework/docs/5.2.4.RELEASE/javadoc-api/org/springframework/context/support/FileSystemXmlApplicationContext.html)。尽管XML是定义配置元数据的传统格式，但是您可以通过提供少量XML配置来声明性地启用对这些其他元数据格式的支持，从而指示容器将Java注释或代码用作元数据格式。
+
+在大多数应用场景中，不需要显式的用户代码来实例化一个Spring IoC容器的一个或多个实例。例如，在Web应用程序场景中，应用程序文件中的简单八行（约）样板Web描述符XML `web.xml`通常就足够了（请参阅[Web应用程序的便捷ApplicationContext实例化](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#context-create)）。如果使用 [Spring Tool Suite](https://spring.io/tools/sts)（基于Eclipse的开发环境），则只需单击几次鼠标或击键即可轻松创建此样板配置。
+
+下图显示了Spring的工作原理的高级视图。您的应用程序类与配置元数据结合在一起，因此，在`ApplicationContext`创建和初始化之后，您将拥有一个完全配置且可执行的系统或应用程序。
+
+### AOP
+
+面向方面的编程（AOP）通过提供另一种思考程序结构的方式来补充面向对象的编程（OOP）。OOP中模块化的关键单元是类，而在AOP中模块化是方面。方面使关注点（例如事务管理）的模块化跨越了多个类型和对象。（这种关注在AOP文献中通常被称为“跨领域”关注。）
+
+Spring的关键组件之一是AOP框架。虽然Spring IoC容器不依赖于AOP（这意味着您不需要使用AOP），但AOP是对Spring IoC的补充，以提供功能非常强大的中间件解决方案。
+
+具有AspectJ切入点的Spring AOP
+
+Spring通过使用[基于模式的方法](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#aop-schema)或[@AspectJ批注样式，](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#aop-ataspectj)提供了编写自定义方面的简单而强大的方法 。这两种样式都提供了完全类型化的建议，并使用了AspectJ切入点语言，同时仍然使用Spring AOP进行编织。
+
+本章讨论基于架构和基于@AspectJ的AOP支持。[下一章](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/core.html#aop-api)将讨论较低级别的AOP支持。
+
+AOP在Spring Framework中用于：
+
+- 提供声明式企业服务。这种服务最重要的是 [声明式事务管理](https://docs.spring.io/spring-framework/docs/current/spring-framework-reference/data-access.html#transaction-declarative)。
+- 让用户实现自定义方面，并通过AOP补充其对OOP的使用。
+
+### SpringMVC
+
+Spring Web MVC是基于Servlet API构建的原始Web框架，并且从一开始就已包含在Spring框架中。正式名称“ Spring Web MVC”来自其源模块（[`spring-webmvc`](https://github.com/spring-projects/spring-framework/tree/master/spring-webmvc)）的名称，但它通常被称为“ Spring MVC”。
+
+与Spring Web MVC并行，Spring Framework 5.0引入了一个反应式堆栈Web框架，其名称“ Spring WebFlux”也基于其源模块（[`spring-webflux`](https://github.com/spring-projects/spring-framework/tree/master/spring-webflux)）。本节介绍Spring Web MVC。在[下一节](https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#spring-web-reactive) 介绍春季WebFlux。
 
 ## （三）Mybatis简介
 
 1. Mybatis简介
-2. Mybatis的使用
+
+MyBatis 是支持定制化[ SQL](https://www.w3cschool.cn/sql/)、存储过程以及高级映射的优秀的持久层框架。MyBatis 避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集。MyBatis 可以对配置和原生Map使用简单的 XML 或注解，将接口和 Java 的 POJOs(Plain Old Java Objects,普通的 Java对象)映射成数据库中的记录。
+
+**优点：**
+
+
+
+- 简单易学：本身就很小且简单。没有任何第三方依赖，最简单安装只要两个jar文件+配置几个sql映射文件易于学习，易于使用，通过文档和源代码，可以比较完全的掌握它的设计思路和实现。
+- 灵活：mybatis不会对应用程序或者数据库的现有设计强加任何影响。 sql写在xml里，便于统一管理和优化。通过sql基本上可以实现我们不使用数据访问框架可以实现的所有功能，或许更多。
+- 解除sql与程序代码的耦合：通过提供DAL层，将业务逻辑和数据访问逻辑分离，使系统的设计更清晰，更易维护，更易单元测试。sql和代码的分离，提高了可维护性。
+- 提供映射标签，支持对象与数据库的orm字段关系映射
+- 提供对象关系映射标签，支持对象关系组建维护
+- 提供xml标签，支持编写动态sql。
+
+**缺点：**
+
+- 编写SQL语句时工作量很大，尤其是字段多、关联表多时，更是如此。
+- SQL语句依赖于数据库，导致数据库移植性差，不能更换数据库。
+- 框架还是比较简陋，功能尚有缺失，虽然简化了数据绑定代码，但是整个底层数据库查询实际还是要自己写的，工作量也比较大，而且不太容易适应快速数据库修改。
+- 二级缓存机制不佳
+
+MyBatis的功能架构： 
+
+
+我们把Mybatis的功能架构分为三层：
+
+1. API接口层：提供给外部使用的接口API，开发人员通过这些本地API来操纵数据库。接口层一接收到调用请求就会调用数据处理层来完成具体的数据处理。
+2. 数据处理层：负责具体的SQL查找、SQL解析、SQL执行和执行结果映射处理等。它主要的目的是根据调用的请求完成一次数据库操作。
+3. 基础支撑层：负责最基础的功能支撑，包括连接管理、事务管理、配置加载和缓存处理，这些都是共用的东西，将他们抽取出来作为最基础的组件。为上层的数据处理层提供最基础的支撑。
+
+
+Mybatis的使用
+
+要使用 MyBatis， 只需将 mybatis-x.x.x.jar 文件置于 classpath 中即可。
+
+如果使用 Maven 来构建项目，则需将下面的 dependency 代码置于 pom.xml 文件中：
+
+```xml
+<dependency>  
+    <groupId>org.mybatis</groupId>  
+    <artifactId>mybatis</artifactId>  
+    <version>x.x.x</version>
+</dependency>
+```
+
+
 
 ## （四）Tomcat简介与搭建
 
