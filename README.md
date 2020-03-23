@@ -593,9 +593,9 @@ Spring Web MVC是基于Servlet API构建的原始Web框架，并且从一开始�
 
 MyBatis 是支持定制化[ SQL](https://www.w3cschool.cn/sql/)、存储过程以及高级映射的优秀的持久层框架。MyBatis 避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集。MyBatis 可以对配置和原生Map使用简单的 XML 或注解，将接口和 Java 的 POJOs(Plain Old Java Objects,普通的 Java对象)映射成数据库中的记录。
 
-**优点：**
+MyBatis SQL映射器框架使将关系数据库与面向对象的应用程序一起使用变得更加容易。MyBatis使用XML描述符或注释将对象与存储过程或SQL语句耦合。相对于对象关系映射工具，简单性是MyBatis数据映射器的最大优势。
 
-
+### **优点：**
 
 - 简单易学：本身就很小且简单。没有任何第三方依赖，最简单安装只要两个jar文件+配置几个sql映射文件易于学习，易于使用，通过文档和源代码，可以比较完全的掌握它的设计思路和实现。
 - 灵活：mybatis不会对应用程序或者数据库的现有设计强加任何影响。 sql写在xml里，便于统一管理和优化。通过sql基本上可以实现我们不使用数据访问框架可以实现的所有功能，或许更多。
@@ -604,7 +604,7 @@ MyBatis 是支持定制化[ SQL](https://www.w3cschool.cn/sql/)、存储过程�
 - 提供对象关系映射标签，支持对象关系组建维护
 - 提供xml标签，支持编写动态sql。
 
-**缺点：**
+### **缺点：**
 
 - 编写SQL语句时工作量很大，尤其是字段多、关联表多时，更是如此。
 - SQL语句依赖于数据库，导致数据库移植性差，不能更换数据库。
@@ -639,7 +639,124 @@ Mybatis的使用
 
 ## （四）Tomcat简介与搭建
 
+### 简介
+
+Apache Tomcat 支持了Java Servlet，JavaServer Page，Java Expression Language和Java的WebSocket技术的一个开源Web容器。Java Servlet，JavaServer Pages，Java Expression Language和Java WebSocket规范是在[Java Community Process](http://jcp.org/en/introduction/overview)下开发的 。它是一个开源的轻量级Web应用服务器，在中小型系统和并发量小的场合下被普遍使用，是开发和调试Servlet、JSP 程序的首选。
+
+  Tomcat主要组件：服务器Server，服务Service，连接器Connector、容器Container。连接器Connector和容器Container是Tomcat的核心。
+
+一个Container容器和一个或多个Connector组合在一起，加上其他一些支持的组件共同组成一个Service服务，有了Service服务便可以对外提供能力了，但是Service服务的生存需要一个环境，这个环境便是Server，Server组件为Service服务的正常使用提供了生存环境，Server组件可以同时管理一个或多个Service服务。
+
+
+
+### 搭建
+
+本项目使用的版本是**Tomcat** 8.5.50（https://tomcat.apache.org/download-80.cgi）
+
+目录结构如下所示
+
+```
+tomcat
+├── BUILDING.txt
+├── CONTRIBUTING.md
+├── LICENSE
+├── NOTICE
+├── README.md
+├── RELEASE-NOTES
+├── RUNNING.txt
+├── bin
+│   ├── attachments
+│   ├── bootstrap.jar
+│   ├── catalina-tasks.xml
+│   ├── catalina.sh
+│   ├── ciphers.sh
+│   ├── commons-daemon-native.tar.gz
+│   ├── commons-daemon.jar
+│   ├── configtest.sh
+│   ├── daemon.sh
+│   ├── digest.sh
+│   ├── hs_err_pid69993.log
+│   ├── logs
+│   │   └── logback
+│   │       ├── error-2020-01-06.log
+│   │       ├── smile_2020-1-6.log
+│   │       └── spring_2020-1-6.log
+│   ├── logs.log
+│   ├── logs.log_2020-01-19.log\ \
+│   ├── logs.log_2020-02-02.log\ \
+│   ├── setclasspath.sh
+│   ├── shutdown.sh
+│   ├── startup.sh
+│   ├── tomcat-juli.jar
+│   ├── tomcat-native.tar.gz
+│   ├── tool-wrapper.sh
+│   └── version.sh
+├── conf
+│   ├── Catalina
+│   │   └── localhost
+│   ├── catalina.policy
+│   ├── catalina.properties
+│   ├── context.xml
+│   ├── jaspic-providers.xml
+│   ├── jaspic-providers.xsd
+│   ├── logging.properties
+│   ├── server.xml
+│   ├── tomcat-users.xml
+│   ├── tomcat-users.xsd
+│   └── web.xml
+├── lib
+├── logs
+├── temp
+├── webapps
+│   ├── ROOT
+│   ├── blog
+│   ├── blog.war
+│   ├── docs
+│   ├── examples
+│   ├── host-manager
+│   ├── manager
+└── work
+    └── Catalina
+        └── localhost
+            ├── ROOT
+            ├── blog
+            ├── docs
+            ├── examples
+            ├── host-manager
+            └── manager
+```
+
+先把Tomcat的目录的读写权限设置好，方便接下来的设置与部署。
+
+在conf/server.xml中配置端口号，初始堆大小，最大堆大小，以及自动热部署功能，并把本项目设置为Tomcat的默认应用
+
+最后把本项目编译好的blog.war拷贝到wepapps下，启动Tomcat：startup.sh
+
+Tomcat会启动JVM，自动扫描wepapps下的项目并解压，把类加载到堆内存中。
+
+
+
 ## （五）WebSocket简介
+
+​		WebSocket 是 HTML5 开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。
+
+​		WebSocket 使得客户端和服务器之间的数据交换变得更加简单，允许服务端主动向客户端推送数据。在 WebSocket API 中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+
+​		在 WebSocket API 中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。
+
+​		现在，很多网站为了实现推送技术，所用的技术都是 Ajax 轮询。轮询是在特定的的时间间隔（如每1秒），由浏览器对服务器发出HTTP请求，然后由服务器返回最新的数据给客户端的浏览器。这种传统的模式带来很明显的缺点，即浏览器需要不断的向服务器发出请求，然而HTTP请求可能包含较长的头部，其中真正有效的数据可能只是很小的一部分，显然这样会浪费很多的带宽等资源。
+
+​		HTML5 定义的 WebSocket 协议，能更好的节省服务器资源和带宽，并且能够更实时地进行通讯。
+
+​		浏览器通过 JavaScript 向服务器发出建立 WebSocket 连接的请求，连接建立以后，客户端和服务器端就可以通过 TCP 连接直接交换数据。
+
+​		当你获取 Web Socket 连接后，你可以通过 **send()** 方法来向服务器发送数据，并通过 **onmessage** 事件来接收服务器返回的数据。
+
+​		WebSocket 协议本质上是一个基于 TCP 的协议。
+
+​		为了建立一个 WebSocket 连接，客户端浏览器首先要向服务器发起一个 HTTP 请求，这个请求和通常的 HTTP 请求不同，包含了一些附加头信息，其中附加头信息"Upgrade: WebSocket"表明这是一个申请协议升级的 HTTP 请求，服务器端解析这些附加的头信息然后产生应答信息返回给客户端，客户端和服务器端的 WebSocket 连接就建立起来了，双方就可以通过这个连接通道自由的传递信息，并且这个连接会持续存在直到客户端或者服务器端的某一方主动的关闭连接。
+
+
 
 ## （六）JavaWeb原理介绍
 
@@ -719,7 +836,17 @@ Java 在客户端的应用有 java applet，使用得很少，Java 在服务器�
 
 项目依据MVC架构，数据模型、视图渲染、处理器处理业务逻辑相互分离，低耦合，高内聚。
 
+Maven项目结构
 
+主模块：arvinclub-blog
+
+主模块又分为为三个子模块：
+
+> **blog-model** 负责数据、实体、模型
+>
+> **blog-service** 封装可复用的、高可用的业务操作
+>
+> **blog-web** 负责解析视图，进行页面的渲染（SpringMVC直接与这一层交互）
 
 ## （二）数据库设计
 
@@ -861,13 +988,62 @@ CREATE TABLE `attention` (
 
 + MyBatis的代理模式：面向接口编程，自动生成Mapper的实现
 
-1. 三层架构搭建
+2. 三层架构搭建
 
 + Controller：控制层，主要用作校验参数，接收参数，传递给service层并且返回结果，Controller层负责具体的业务模块流程的控制，在此层里面要调用Serice层的接口来控制业务流程，控制的配置也同样是在Spring的配置文件里面进行，针对具体的业务流程，会有不同的控制器，我们具体的设计过程中可以将流程进行抽象归纳，设计出可以重复利用的子单元流程模块，这样不仅使程序结构变得清晰，也大大减少了代码量。
 + Service：Service层主要负责业务模块的逻辑应用设计。同样是首先设计接口，再设计其实现的类，接着再Spring的配置文件中配置其实现的关联。这样我们就可以在应用中调用Service接口来进行业务处理。Service层的业务实现，具体要调用到已定义的DAO层的接口，封装Service层的业务逻辑有利于通用的业务逻辑的独立性和重复利用性，程序显得非常简洁。
 + Dao：DAO层主要是做数据持久层的工作，负责与数据库进行联络的一些任务都封装在此，DAO层的设计首先是设计DAO的接口，然后在Spring的配置文件中定义此接口的实现类，然后就可在模块中调用此接口来进行数据业务的处理，而不用关心此接口的具体实现类是哪个类，显得结构非常清晰，DAO层的数据源配置，以及有关数据库连接的参数都在Spring的配置文件中进行配置。
 
 各个层之间只能单向调用，禁止逆向调用。
+
+### 1. 主要功能
+
+-  发布微博
+-  浏览微博
+-  个人空间
+-  粉丝关注
+-  多人聊天
+
+### 2. 用户登录
+
+-  除了通过注册来添加用户，管理员也可以添加用户。登录后的用户可以进入并使用本系统。
+
+### 3. 修改密码
+
+-  用户和管理员都可以修改密码。
+
+### 4. 粉丝关注
+
+-  用户可以关注自己喜欢的博主，并能够在关注动态看到他们新发的微博。
+-  用户还能在关注列表里看到自己关注的所有博主，也可以随时取消关注。
+-  博主也可以在个人空间看到有谁关注了自己。
+
+### 5. 用户管理
+
+-  删除用户: 管理员可以删除普通用户。
+-  禁言用户: 使普通用户（永久或期限）禁止在本系统发布任何内容。
+-  查询用户: 通过用户名或ID查找用户，并查看他们的所有信息。
+-  删除博客: 管理员可以删除任何微博。
+-  管理员除了拥有以下功能以外，同时拥有普通用户的所有功能。
+
+### 6. 微博系统
+
+-  发布微博: 用户登录后随时可以发布微博（限制140字，9张图片）。
+-  查看微博: 用户可以在首页看到微博，也可以在关注动态看到关注的博主发的微博。
+-  编辑微博: 用户只能编辑自己已经发出的微博。
+-  删除微博: 普通用户只能删除自己发的微博，而管理员能删除任何微博。
+
+### 7. 用户评论
+
+-  用户可以在博客下面发表评论，修改或删除自己发的评论。
+
+### 8. 多人聊天
+
+-  用户可以在多人聊天室参与聊天，所有进入聊天室的用户都可以实时看到聊天内容。
+
+### 9. 站内搜索
+
+-  用户可以通过关键词索==用户==和微博内容。
 
 
 
@@ -1008,7 +1184,7 @@ public class BlogWebAppInitializer extends AbstractAnnotationConfigDispatcherSer
 
 ## （二）数据库持久化
 
-1. Mysql的安装
+1. Mysql的安装（https://dev.mysql.com/downloads/mysql/）
 
    本项目安装了MySQL5.7，这个版本比较稳定，而且安全性方面有所增强，同时InnoDB首次支持了全文索引
 
@@ -1016,18 +1192,474 @@ public class BlogWebAppInitializer extends AbstractAnnotationConfigDispatcherSer
 
    配置MySQL的用户名，这里用的root账户，配置好密码，并设置最长连接时间为8小时。并调整时区为北京时间（与操作系统一致），根据机器性能设置最大并发数量，并把所有编码格式都调整为utf-8mb4（Mysql的utf8编码并不是真正的UTF-8编码，Mysql的utf8最多只支持3个字节，而emoji表情、一些特殊的中文字符则需要4个字节才能存储， 因此才会报错。下面是来自[维基百科的Unicode字符平面映射](https://zh.wikipedia.org/wiki/Unicode字符平面映射)，其中UTF-8编码是U+2528D，属于CJK Unified Ideographs Extension B（中日韩统一表意文字扩充B）字符集的字符，处于第二辅助平面（SIP，表意文字补充平面），最多支持4个字节。而Mysql的utf8编码则属于常见的基本多文种平面（BMP，即Unicode编码范围在0000-FFFF之内）的字符，最多支持3个字节。）
 
-3. 表设计
+3. 设置默认引擎，缓存配置，以及最大并发量
 
-4. 添加测试数据
+4. 表设计
 
-5. 数据库移动到服务器
+   设计主要表的第一个版本：用户，博客，评论，关注
+
+5. 添加测试数据
+
+   手动添加测试数据到数据库
+
+6. 数据库移动到服务器
+
+   用MySQL的dump命令导出blog.sql文件，在Linux云主机上导入初始测试数据
+
+7. 构建MyBatis测试
+
+   写一个简单的MyBatis测试，测试其久化功能是否正常，性能是否足够
 
 ## （三）日志
 
 1. Log4j介绍
+
+Apache Log4j 2是Log4j的升级版，对Log4j的前身Log4j 1.x进行了重大改进，并提供了Logback中可用的许多改进，同时解决了Logback体系结构中的一些固有问题。
+
+Log4j的API与实现是分开的，从而使应用程序开发人员可以清楚地了解他们可以使用哪些类和方法，同时确保向前的兼容性。这允许Log4j团队以兼容的方式安全地改进实施。
+
+Log4j API是一个日志外观，可以与Log4j实现一起使用，但是也可以在其他日志实现（例如Logback）之前使用。与SLF4J相比，Log4j API具有多个优点：1. Log4j API支持记录[消息](https://logging.apache.org/log4j/2.x/manual/messages.html)而不只是字符串。2. Log4j API支持lambda表达式。3.与SLF4J相比，Log4j API提供了更多的日志记录方法。4.除了SLF4J支持的“参数化日志记录”格式外，Log4j API还支持使用java.text.MessageFormat语法以及printf样式消息的事件。5. Log4j API提供了LogManager.shutdown（）方法。基础的日志记录实现必须实现Terminable接口才能使该方法生效。6.完全支持标记，日志级别和ThreadContext（aka MDC）之类的其他构造。
+
+Log4j 2包含基于LMAX Disruptor库的下一代异步记录器。在多线程方案中，与Log4j 1.x和Logback相比，异步Logger的吞吐量高18倍，延迟降低了几个数量级。有关详细信息，请参见[异步日志记录性能](https://logging.apache.org/log4j/2.x/manual/async.html#Performance)。否则，Log4j 2明显优于Log4j 1.x，Logback和java.util.logging，尤其是在多线程应用程序中。Log4j 2 API将提供最佳性能，而Log4j 2提供对Log4j 1.2，SLF4J，Commons Logging和java.util.logging（JUL）API的支持。
+
+编码为Log4j 2 API的应用程序始终可以选择使用任何SLF4J兼容库作为其Log4j-to-slf4j适配器的记录器实现。与Logback一样，Log4j 2可以在修改后自动重新加载其配置。与Logback不同，它在进行重新配置时不会丢失日志事件。Log4j 2支持基于上下文数据，标记，正则表达式和Log事件中的其他组件进行过滤。可以指定过滤，以将其应用于所有事件，然后再传递给Logger或当事件通过Appender时。此外，过滤器也可以与Loggers关联。与Logback不同，您可以在任何这些情况下使用通用的Filter类。
+
+在Log4j 2中，可以通过代码或配置轻松定义[自定义日志级别](https://logging.apache.org/log4j/2.x/manual/customloglevels.html)。无需子类化。除了使用Log4j API中的许多日志方法之一之外，还可以使用构建器来构造日志事件。有关更多信息，请参见[Log Builder] [manual / logbuilder.html]。
+
+在稳态日志记录期间，Log4j 2 在独立应用程序中是无[垃圾的](https://logging.apache.org/log4j/2.x/manual/garbagefree.html)，而在Web应用程序中是低垃圾的。这样可以减少垃圾收集器上的压力，并可以提供更好的响应时间性能。
+
 2. 用log4j建立项目日志体系
 
+在类路径下创建log4j.properties，并从官网（https://logging.apache.org/log4j/2.x/）拷贝一份log4j.properties的模板，根据实际要求修改loggers, appenders 和layouts，然后再测试日志在控制台和log文件中是否能够正常输出，磨刀不误砍柴工，日志的配置将大大提升接下来的开发效率。
+
++ Logger: 日志记录器，日志记录的核心类，用于输出不同日志级别的消息
++ Appender: 日志输出目标，用于指定日志输出的目的地，如控制台、文件等等。
++ Layout: 日志格式化器，用于指定日志按照什么格式输出，是日志输出的格式化器。
+
+
+
 ## （四）交互界面
+
+### 用户登录
+
+输入网址后自动进入登录页面，未登录用户尝试符合/user/**的请求是，会被UserFilter拦截，重定向到登录页面，做到登录校验拦截器的功能，用户请求登录时，后台验证账户和密码参数，它们都不为空，且验证正确是才回成功登录，清除上一位用户的搜索记录等残留信息，并在会话（HttpSession）中添加登录的用户信息，以便接下来使用和防止被登录拦截器拦截，如果登录失败，则重定向到登录页面，传递错误信息。
+
+```java
+/**
+ * 登录功能
+ */
+@PostMapping({"/", "login.html"})
+public String login(@Valid User user, Errors errors, HttpSession session, RedirectAttributes model) {
+    /*检查用户名和密码是否为空*/
+    if (errors.hasErrors())
+        return "login";
+    /*检查用户名和密码是否正确*/
+    User realUser = userService.checkUser(user);
+    if (realUser != null) {
+        session.setAttribute("user", realUser);
+        /*清除搜索的记录*/
+        session.removeAttribute("blogList");
+        session.removeAttribute("keyword");
+        session.removeAttribute("page");
+        return "redirect:user/blogs.html";
+    }
+    /*通知是否有错误*/
+    model.addFlashAttribute("msg", "err");
+    return "redirect:/";
+}
+```
+
+相关SQL语句
+
+```mysql
+SELECT user_id, user_name, status, admin, user_date, muted, user_password
+FROM user
+WHERE user_name = '施航程' AND user_password = '123' and status > 0;
+```
+
+
+
+
+
+### 修改密码
+
+用户在已经登录的状态下可以在个人空间修改自己的密码，修改之前会校验密码是否符合规范（任意长度的非空字符串），不符合会抛出异常，警告用户。
+
+```java
+/**
+ * 修改密码
+ */
+@PostMapping("user/changePassword")
+public String changePassword(HttpSession session, String password) {
+    if (!Pattern.matches("[\\S]+", password))
+        throw new IllegalArgumentException("密码格式错误!");
+    User user = (User) session.getAttribute("user");
+    user.setPassword(password);
+    userService.changePassword(user);
+    return "redirect:/user/page.html";
+}
+```
+
+相关SQL语句
+
+```mysql
+UPDATE user SET user_password = '123456'
+WHERE user_id = 2;
+```
+
+
+
+### 4. 粉丝关注
+
+-  用户可以关注自己喜欢的博主，并能够在关注动态看到他们新发的微博。
+-  用户还能在关注列表里看到自己关注的所有博主，也可以随时取消关注。
+-  博主也可以在个人空间看到有谁关注了自己。
+
+```java
+/**
+ * 用户关注相关
+ */
+@Controller
+public class AttentionController {
+
+    @Resource
+    private UserService userService;
+
+    /**
+     * 关注
+     */
+    @PostMapping("user/addAttention/{userId}/{page}")
+    public String addAttention(HttpSession session, @PathVariable int userId, @PathVariable String page) {
+        User me = (User) session.getAttribute("user");
+        int myId = me.getId();
+        if (myId != userId && !userService.isAttention(me.getId(), userId))
+            userService.addAttention(myId, userId);
+        return "redirect:/user/page.html/" + userId + "/" + page;
+    }
+
+    /**
+     * 取关
+     */
+    @PostMapping("user/delAttention/{userId}/{page}")
+    public String delAttention(HttpSession session, @PathVariable int userId, @PathVariable String page) {
+        User me = (User) session.getAttribute("user");
+        userService.delAttention(me.getId(), userId);
+        return "redirect:/user/page.html/" + userId + "/" + page;
+    }
+
+    /**
+     * 关注列表
+     */
+    @GetMapping("user/attentionList/{userId}")
+    public String attentionList(@PathVariable int userId, Model model) {
+        PageInfo<User> listPage = userService.attentionList(userId);
+        model.addAttribute("listPage", listPage);
+        model.addAttribute("host", userService.findUserById(userId));
+        model.addAttribute("msg", "的关注");
+        return "list";
+    }
+
+    /**
+     * 粉丝列表
+     */
+    @GetMapping("user/fansList/{userId}")
+    public String fansList(@PathVariable int userId, Model model) {
+        PageInfo<User> listPage = userService.fansList(userId);
+        model.addAttribute("listPage", listPage);
+        model.addAttribute("host", userService.findUserById(userId));
+        model.addAttribute("msg", "的粉丝");
+        return "list";
+    }
+}
+```
+
+相关SQL语句
+
+```xml
+<insert id="attention">
+    INSERT INTO attention(blogger_id, fans_id)
+    VALUES (#{blogger}, #{fans})
+</insert>
+
+<delete id="delAttention">
+    DELETE
+    FROM attention
+    WHERE blogger_id = #{blogger}
+      AND fans_id = #{fans}
+</delete>
+
+<select id="attentionList" resultMap="userMap" parameterType="int">
+    select u.user_id, u.user_name, u.status, u.admin, u.user_date, u.muted
+    from user u
+             inner join attention a on u.user_id = a.blogger_id
+    where a.fans_id = #{id}
+</select>
+
+<select id="fansList" resultMap="userMap">
+    select u.user_id, u.user_name, u.status, u.admin, u.user_date, u.muted
+    from user u
+             inner join attention a on u.user_id = a.fans_id
+    where a.blogger_id = #{id}
+</select>
+```
+
+
+
+
+
+### 5. 用户管理
+
+-  删除用户: 管理员可以删除普通用户。
+-  禁言用户: 使普通用户（永久或期限）禁止在本系统发布任何内容。
+-  查询用户: 通过用户名或ID查找用户，并查看他们的所有信息。
+-  删除博客: 管理员可以删除任何微博。
+-  管理员除了拥有以下功能以外，同时拥有普通用户的所有功能。
+
+```java
+/**
+ * 管理员相关
+ */
+@Controller
+public class AdminController {
+
+    @Resource
+    private UserService userService;
+
+    /**
+     * 管理员页面,默认第一页
+     */
+    @GetMapping("admin/manager.html")
+    public String admin(Model model, @RequestParam(required = false) String username) {
+        return admin(model, 1, username);
+    }
+
+    /**
+     * 管理员页面,分页
+     */
+    @GetMapping("admin/manager.html/{page}")
+    public String admin(Model model, @PathVariable int page, @RequestParam(required = false) String username) {
+        /*根据页号获取数据*/
+        username = StringUtils.isEmpty(username) ? null : username.trim();
+        PageInfo<User> userPage = userService.selectAllUser(page, username);
+        model.addAttribute("userPage", userPage);
+        return "admin/list";
+    }
+
+    /**
+     * 删除用户
+     *
+     * @param userId userId
+     * @param page page
+     */
+    @PostMapping("admin/delUser/{userId}/{page}")
+    public String delUser(@PathVariable int userId, @PathVariable String page) {
+        userService.delUser(userId);
+        return "redirect:/admin/manager.html/" + page;
+    }
+
+    /**
+     * 恢复用户
+     *
+     * @param userId userId
+     * @param pages  page
+     */
+    @PostMapping("admin/reuseUser/{userId}/{pages}")
+    public String reuseUser(@PathVariable int userId, @PathVariable String pages) {
+        userService.reuseUser(userId);
+        return "redirect:/admin/manager.html/" + pages;
+    }
+
+    /**
+     * 禁言用户
+     *
+     * @param userId userId
+     * @param days   天数
+     * @param pages  pages
+     */
+    @PostMapping("admin/mute/{userId}/{days}/{pages}")
+    public String mute(@PathVariable int userId, @PathVariable int days, @PathVariable String pages) {
+        userService.mute(userId, days);
+        return "redirect:/admin/manager.html/" + pages;
+    }
+
+}
+```
+
+相关SQL语句
+
+```xml
+<select id="selectAllUser" resultMap="userMap" parameterType="string">
+    SELECT user_id, user_name, status, admin, user_password, user_date, muted
+    FROM user
+    <where>
+        <if test="_parameter != null">
+            user_id = #{key}
+            OR user_name LIKE &quot;%&quot;#{key}&quot;%&quot;
+        </if>
+    </where>
+    ORDER BY user_id
+</select>
+
+<update id="delUser" parameterType="int">
+    UPDATE user
+    SET status = 0
+    WHERE user_id = #{id}
+</update>
+
+<update id="reuseUser" parameterType="int">
+    UPDATE user
+    SET status = 1
+    WHERE user_id = #{id}
+</update>
+
+<update id="mute" parameterType="com.arvinclub.model.entity.User">
+    UPDATE user
+    SET user_date = #{muteDeadline},
+        muted     = #{muted}
+    WHERE user_id = #{id};
+</update>
+```
+
+
+
+
+
+### 6. 微博系统
+
+-  发布微博: 用户登录后随时可以发布微博（限制140字，9张图片）。
+
+1. 从会话（Http Session）中获取当前用户信息，包括用户ID、用户名。
+2. 为传过来的博客实体添加图片文件信息（如果用户发了图片的话）。
+3. MyBatis自动生成的SQL语句，并执行。
+4. 重定向到博客浏览页面，用户就能看到自己刚刚发布的博客了。
+
+```java
+/**
+ * 发布博客
+ *
+ * @param blog  博客
+ * @param files 图片文件
+ * @return 成功则转到社区主页，否则转到错误提示页面
+ */
+@PostMapping("user/addBlog")
+public String addBlog(Blog blog, HttpSession httpSession, @RequestParam MultipartFile[] files) throws Exception {
+    User me = (User) httpSession.getAttribute("user");
+    userService.checkMuted(me);
+    /*给blog添加filenames（面向数据库的图片文件名）*/
+    blog.setFilenames(ToolsUtil.saveIMG(files, CLASSPATH));
+    blog.setUser(me);
+    /*添加博客*/
+    blogService.addBlog(blog);
+    return "redirect:/user/blogs.html";
+}
+```
+
+相关SQL语句
+
+```xml
+<insert id="addBlog">
+    INSERT INTO blogs (blog_content, blog_time, user_id, filenames)
+    VALUES (#{content}, #{time}, #{id}, #{filenames})
+</insert>
+```
+
+
+
+-  查看微博: 用户可以在首页看到微博，也可以在关注动态看到关注的博主发的微博。
+
+通过页号，查询出一部分信息，并返回，如果未制定页号则默认第一页。
+
+```java
+/**
+ * 查看博客（默认第一页）
+ */
+@GetMapping("user/blogs.html")
+public String showBlogs(Model model) {
+    return showBlogs(model, 1);
+}
+
+/**
+ * 查看博客（指定页号）
+ *
+ * @param page 页号
+ */
+@GetMapping("user/blogs.html/{page}")
+public String showBlogs(Model model, @PathVariable int page) {
+    /*根据页号获取数据*/
+    PageInfo<Blog> blogPage = blogService.selectAllBlog(page);
+    model.addAttribute("blogPage", blogPage);
+    return "blogs";
+}
+
+/**
+ * 查看关注动态（默认第一页）
+ */
+@GetMapping("user/attention.html")
+public String attention(Model model,HttpSession session) {
+    return attention(model, 1, session);
+}
+
+/**
+ * 查看关注动态（指定页号）
+ *
+ * @param page 页号
+ */
+@GetMapping("user/attention.html/{page}")
+public String attention(Model model, @PathVariable int page,HttpSession session) {
+    /*根据页号获取数据*/
+    User me = (User) session.getAttribute("user");
+    PageInfo<Blog> blogPage = blogService.attentionBlogs(me.getId(), page);
+    model.addAttribute("blogPage", blogPage);
+    return "attention";
+}
+```
+
+相关SQL语句
+
+```xml
+<select id="selectBlogsByUserId" resultMap="blogMap" parameterType="int">
+    SELECT blog_id, blog_content, blog_time, user_id, filenames
+    FROM blogs
+    <where>
+        <if test="_parameter > 0">
+            user_id = #{id}
+        </if>
+        AND status = 1
+    </where>
+    ORDER BY blog_id DESC
+</select>
+
+<select id="attentionBlogs" resultMap="blogMap" parameterType="int">
+    SELECT blog_id, blog_content, blog_time, user_id, filenames
+    FROM blogs
+    WHERE status = 1
+      AND user_id IN (SELECT blogger_id FROM attention WHERE fans_id = #{id} and status = 1)
+    ORDER BY blog_id DESC
+</select>
+```
+
+
+
+
+
++ 个人主页: 用户可以查看其他用户的个人主页，会显示他的所有博客
+
+
+
+-  编辑微博: 用户只能编辑自己已经发出的微博。
+-  删除微博: 普通用户只能删除自己发的微博，而管理员能删除任何微博。
+
+### 7. 用户评论
+
+-  用户可以在博客下面发表评论，修改或删除自己发的评论。
+
+### 8. 多人聊天
+
+-  用户可以在多人聊天室参与聊天，所有进入聊天室的用户都可以实时看到聊天内容。
+
+### 9. 站内搜索
+
+
 
 ## （五）聊天室的交互实现
 
