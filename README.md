@@ -879,7 +879,154 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 ```
 
-实体属性图
+实体类设计：
+
+```java
+/**
+ * 用户实体类
+ */
+public class User {
+
+    /**
+     * 用于数据库映射
+     */
+    private int id;
+    private int status;//状态 1正常，0停用:无法登录
+    private int admin;//权限
+    private int muted;//1禁言，0正常
+    private Date muteDeadline;//禁言截止时间 muted为1时才有效
+
+    /**
+     * 用于前端显示
+     */
+    private String muteDeadTime;//muteDeadline 面向前端
+
+    /**
+     * 其他
+     */
+    private int fansCount;
+    private int idolCount;
+
+    public int getFansCount() {
+        return fansCount;
+    }
+
+    public void setFansCount(int fansCount) {
+        this.fansCount = fansCount;
+    }
+
+    public int getIdolCount() {
+        return idolCount;
+    }
+
+    public void setIdolCount(int idolCount) {
+        this.idolCount = idolCount;
+    }
+
+    public String getMuteDeadTime() {
+        if (muteDeadTime == null && muteDeadline != null)
+            muteDeadTime = ToolsUtil.SIMPLE_DATE_FORMAT.format(muteDeadline);
+        return muteDeadTime;
+    }
+
+    public void setMuteDeadTime(String muteDeadTime) {
+        this.muteDeadTime = muteDeadTime;
+    }
+
+    public Date getMuteDeadline() {
+        return muteDeadline;
+    }
+
+    public void setMuteDeadline(Date muteDeadline) {
+        this.muteDeadline = muteDeadline;
+    }
+
+    public int getMuted() {
+        return muted;
+    }
+
+    public void setMuted(int muted) {
+        this.muted = muted;
+    }
+
+    @NotNull
+    @Size(min = 1)
+    @Pattern(regexp = "[\\S]+")
+    private String name;//用户名
+
+    @NotNull
+    @Size(min = 1)
+    @Pattern(regexp = "[\\S]+")
+    private String password;//密码
+
+    public User() { }
+
+    public User(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public int getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(int admin) {
+        this.admin = admin;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "{" + id + ":" + name + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return id == user.getId() || Objects.equals(name, user.getName());
+    }
+
+}
+```
+
+
+
+实体属性图：
 
 <img src="/Users/arvin/Documents/Documents/学校/毕设/images/用户.png" alt="用户" style="zoom:50%;" />
 
@@ -910,6 +1057,117 @@ CREATE TABLE `blogs` (
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 ```
 
+实体类设计：
+
+```java
+/**
+ * 博客实体类
+ */
+public class Blog {
+    /**
+     * 用于数据库映射
+     */
+    private int id;
+    private String content;//博客内容
+    private Date date;//时间，面向数据库
+    private User user;//此博客发布者
+    private int status;//状态 1显示 0不显示
+    private String filenames;//图片文件名，面向数据库
+    private List<Comment> commentList;
+
+    /**
+     * 用于前端显示
+     */
+    private String time;//时间，面向前端
+    private String[] filenameList;//图片文件名，面向前端
+
+    private int commentCount;
+    public void setFilenames(String filenames) {
+        this.filenames = filenames;
+        if (filenames != null)
+            filenameList = filenames.split(" \n ");
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String[] getFilenameList() {
+        return filenameList;
+    }
+
+    public String getTime() {
+        if (time == null && date != null)
+            time = ToolsUtil.SIMPLE_DATE_FORMAT.format(date);
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getFilenames() {
+        return filenames;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<Comment> getCommentList() {
+        return commentList;
+    }
+
+    public void setCommentList(List<Comment> commentList) {
+        this.commentList = commentList;
+    }
+
+    public int getCommentCount() {
+        return commentList.size();
+    }
+
+    @Override
+    public String toString() {
+        return id + ":" + content + ":" + ToolsUtil.SIMPLE_DATE_FORMAT.format(date) + "{" + user + "}";
+    }
+
+}
+```
+
+
+
 实体属性图：
 
 <img src="/Users/arvin/Documents/Documents/学校/毕设/images/博客.png" alt="博客" style="zoom:50%;" />
@@ -938,6 +1196,116 @@ CREATE TABLE `comment` (
   PRIMARY KEY (`comment_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 ```
+
+实体类设计：
+
+```java
+/**
+ * 评论实体类
+ */
+public class Comment
+{
+    /**
+     * 用于数据库映射
+     */
+    private int id;
+    private String content;//评论内容
+    private Date date;//时间，面向数据库
+    private User user;//此评论发布者
+    private int status;//状态 1显示 0不显示
+    private Blog blog;//对应博客
+
+
+    /**
+     * 用于前端显示
+     */
+    private String time;//时间，面向前端
+    private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("YYYY年MM月dd日 HH:mm");
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getContent()
+    {
+        return content;
+    }
+
+    public void setContent(String content)
+    {
+        this.content = content;
+    }
+
+    public Date getDate()
+    {
+        return date;
+    }
+
+    public void setDate(Date date)
+    {
+        this.date = date;
+        if (date != null)
+            time = SIMPLE_DATE_FORMAT.format(date);
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    public void setUser(User user)
+    {
+        this.user = user;
+    }
+
+    public String getTime()
+    {
+        return time;
+    }
+
+    public void setTime(String time)
+    {
+        this.time = time;
+    }
+
+    public int getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(int status)
+    {
+        this.status = status;
+    }
+
+    public Blog getBlog() {
+        return blog;
+    }
+
+    public void setBlog(Blog blog) {
+        this.blog = blog;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Comment{" +
+                "id=" + id +
+                ", content='" + content + '\'' +
+                ", user=" + user +
+                ", time='" + time + '\'' +
+                '}';
+    }
+}
+```
+
+
 
 实体属性图：
 
@@ -1240,9 +1608,35 @@ Log4j 2包含基于LMAX Disruptor库的下一代异步记录器。在多线程�
 
 ## （四）交互界面
 
-### 用户登录
+### 1. 用户登录
 
-输入网址后自动进入登录页面，未登录用户尝试符合/user/**的请求是，会被UserFilter拦截，重定向到登录页面，做到登录校验拦截器的功能，用户请求登录时，后台验证账户和密码参数，它们都不为空，且验证正确是才回成功登录，清除上一位用户的搜索记录等残留信息，并在会话（HttpSession）中添加登录的用户信息，以便接下来使用和防止被登录拦截器拦截，如果登录失败，则重定向到登录页面，传递错误信息。
+输入网址后自动进入登录页面，未登录用户尝试符合/user/**的请求是，会被UserFilter拦截，重定向到登录页面，做到登录校验拦截器的功能。
+
+```java
+/**
+ * 未登录拦截
+ */
+@WebFilter(filterName = "userFilter",urlPatterns = "/user/*")
+public class UserFilter implements Filter
+{
+    public void destroy(){}
+
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException
+    {
+        if (((HttpServletRequest) req).getSession().getAttribute("user") != null)
+            chain.doFilter(req, resp);
+        else
+            ((HttpServletResponse)resp).sendRedirect("/");
+    }
+
+    public void init(FilterConfig config){ }
+
+}
+```
+
+
+
+用户请求登录时，后台验证账户和密码参数，它们都不为空，且验证正确是才回成功登录，清除上一位用户的搜索记录等残留信息，并在会话（HttpSession）中添加登录的用户信息，以便接下来使用和防止被登录拦截器拦截，如果登录失败，则重定向到登录页面，传递错误信息。
 
 ```java
 /**
@@ -1281,7 +1675,7 @@ WHERE user_name = '施航程' AND user_password = '123' and status > 0;
 
 
 
-### 修改密码
+### 2. 修改密码
 
 用户在已经登录的状态下可以在个人空间修改自己的密码，修改之前会校验密码是否符合规范（任意长度的非空字符串），不符合会抛出异常，警告用户。
 
@@ -1414,6 +1808,35 @@ public class AttentionController {
 -  查询用户: 通过用户名或ID查找用户，并查看他们的所有信息。
 -  删除博客: 管理员可以删除任何微博。
 -  管理员除了拥有以下功能以外，同时拥有普通用户的所有功能。
+
+非管理员用户尝试符合/admin/**的请求是，会被AdminFilter拦截，重定向到主页面，做到权限校验拦截器的功能。
+
+```java
+/**
+ * 未登录拦截
+ */
+@WebFilter(filterName = "adminFilter",urlPatterns = "/admin/*")
+public class AdminFilter implements Filter
+{
+    public void destroy(){}
+
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws ServletException, IOException
+    {
+        User user = (User) ((HttpServletRequest) req).getSession().getAttribute("user");
+        if (user != null && user.getAdmin() > 0)
+            chain.doFilter(req, resp);
+        else
+            ((HttpServletResponse)resp).sendRedirect("/user/blogs.html");
+    }
+
+    public void init(FilterConfig config){ }
+
+}
+```
+
+
+
+用户请求登录时，后台会在会话（HttpSession）中添加登录的用户信息时，加入用户的管理员权限信息，以便接下来使用和被登录拦截器验证通过或者拦截，如果验证失败，则重定向到主页面。
 
 ```java
 /**
@@ -1565,9 +1988,7 @@ public String addBlog(Blog blog, HttpSession httpSession, @RequestParam Multipar
 
 
 
--  查看微博: 用户可以在首页看到微博，也可以在关注动态看到关注的博主发的微博。
-
-通过页号，查询出一部分信息，并返回，如果未制定页号则默认第一页。
+-  查看微博: 用户可以在首页看到微博，也可以在关注动态看到关注的博主发的微博。通过页号，查询出一部分信息，并返回，如果未指定页号则默认第一页，
 
 ```java
 /**
@@ -1640,30 +2061,537 @@ public String attention(Model model, @PathVariable int page,HttpSession session)
 
 
 
++ 个人主页: 用户可以查看其他用户的个人主页，会显示他的所有博客。通过参数中的用户ID，查找某个用户的博客，如果该用户不存在，则抛出异常。通过页号，查询出一部分信息，并返回，如果未指定页号则默认第一页。
 
+```java
+/**
+ * 个人主页相关
+ */
+@Controller
+public class PageController {
+    @Resource
+    private BlogService blogService;
 
-+ 个人主页: 用户可以查看其他用户的个人主页，会显示他的所有博客
+    @Resource
+    private UserService userService;
+
+    /**
+     * 进入我的个人主页（默认第一页）
+     */
+    @GetMapping("user/page.html")
+    public String seeMe(Model model, HttpSession session) {
+        return seeWithPage(0, model, "1", session);
+    }
+
+    /**
+     * 进入某人个人主页（默认第一页）
+     */
+    @GetMapping("user/page.html/{userID}")
+    public String see(@PathVariable int userID, Model model, HttpSession session) {
+        return seeWithPage(userID, model, "1", session);
+    }
+
+    /**
+     * 进入某人个人主页（指定页号）
+     */
+    @GetMapping("user/page.html/{userID}/{str}")
+    public String seeWithPage(@PathVariable int userID, Model model, @PathVariable String str, HttpSession session) {
+        /* 确认用户*/
+        User me = (User) session.getAttribute("user");
+        User someone = userService.findUserById(userID == 0 ? me.getId() : userID);
+        /*确认页号,开始查询*/
+        PageInfo<Blog> blogPage = blogService.selectBlogsByUserId(someone.getId(), Integer.parseInt(str));
+        /*返回信息*/
+        model.addAttribute("blogPage", blogPage);
+        model.addAttribute("someone", someone);
+        boolean hoster = me.equals(someone);
+        model.addAttribute("hoster", hoster);
+        if (!hoster)
+            model.addAttribute("isAttention", userService.isAttention(me.getId(), someone.getId()));
+        return "page";
+    }
+}
+
+```
+
+相关SQL语句
+
+```xml
+<select id="selectBlogsByUserId" resultMap="blogMap" parameterType="int">
+    SELECT blog_id, blog_content, blog_time, user_id, filenames
+    FROM blogs
+    <where>
+        <if test="_parameter > 0">
+            user_id = #{id}
+        </if>
+        AND status = 1
+    </where>
+    ORDER BY blog_id DESC
+</select>
+```
+
+```mysql
+SELECT blog_id, blog_content, blog_time, user_id, filenames
+FROM blogs
+WHERE user_id = 2 AND status = 1 ORDER BY blog_id DESC
+LIMIT 15;
+```
 
 
 
 -  编辑微博: 用户只能编辑自己已经发出的微博。
+
+1. 获取当前登录的用户。
+2. 通过传过来的参数：博客ID确定尝试修改的博客。
+3. 获取该博客发布者的用户。
+4. 确定当前登录的用户是否有权限更改此博客（当前登录的用户就是发布者，或者权限高于发布者则被判断为有权限）。
+5. 无论是否修改成功，都重定向到此博客的详情页面。
+
+```java
+/**
+ * 编辑博客
+ *
+ * @return 成功则转到个人主页，否则转到错误提示页面
+ */
+@PostMapping("user/editBlog")
+public String editBlog(Blog blog, HttpSession httpSession) {
+    /*如果有编辑权限则删除*/
+    User me = (User) httpSession.getAttribute("user");
+    userService.checkMuted(me);
+    Blog oldBlog = blogService.blogDetail(blog.getId());
+    User someone = oldBlog.getUser();
+    if (me.equals(someone) || me.getAdmin() > someone.getAdmin()) {
+        blog.setContent(blog.getContent().replaceAll("\\\\r\\\\n","\r\n"));
+        blogService.editBlog(blog);
+    }
+    return "redirect:/user/detail.html/" + blog.getId();
+}
+```
+
+相关SQL语句
+
+```xml
+<update id="editBlog" parameterType="com.arvinclub.model.entity.Blog">
+    update blogs
+    set blog_content = #{content}
+    where blog_id = #{id}
+</update>
+```
+
+```mysql
+update blogs set blog_content = '测试'
+WHERE blog_id = 223;
+```
+
+
+
 -  删除微博: 普通用户只能删除自己发的微博，而管理员能删除任何微博。
+
+1. 获取当前登录的用户。
+2. 通过传过来的参数：博客ID确定尝试的博客。
+3. 获取该博客发布者的用户。
+4. 确定当前登录的用户是否有权限删除此博客（当前登录的用户就是发布者，或者权限高于发布者则被判断为有权限）。
+5. 无论是否删除成功，都重定向到此博客的详情页面。
+
+```java
+/**
+ * 删除博客
+ *
+ * @param blogId blog_id
+ * @return 成功则转到个人主页，否则转到错误提示页面
+ */
+@GetMapping("user/delBlog/{blogId}")
+public String delBlog(@PathVariable int blogId, HttpSession httpSession) {
+    /*如果有编辑权限则删除*/
+    Blog blog = blogService.blogDetail(blogId);
+    User me = (User) httpSession.getAttribute("user");
+    User someone = blog.getUser();
+    if (me.equals(someone) || me.getAdmin() > someone.getAdmin())
+        blogService.delBlog(blogId);
+    return "redirect:/user/page.html/" + blog.getUser().getId();
+}
+```
+
+相关SQL语句
+
+删除博客实际上是改变此博客的标志，而非真正删除所有数据
+
+```xml
+<update id="delBlog" parameterType="int">
+    UPDATE blogs
+    SET status = 0
+    WHERE blog_id = #{id}
+</update>
+```
+
+```mysql
+UPDATE blogs SET status = 0
+WHERE blog_id = 223;
+```
+
+
 
 ### 7. 用户评论
 
 -  用户可以在博客下面发表评论，修改或删除自己发的评论。
 
+```java
+/**
+ * 评论相关
+ */
+@Controller
+public class CommentController {
+
+    @Resource
+    private CommentService commentService;
+    @Resource
+    private UserService userService;
+
+    /**
+     * 发布评论
+     *
+     * @return 成功则转到微博详情，否则转到错误提示页面
+     */
+    @PostMapping("user/addComment/{blogId}")
+    public String addComment(Comment comment, HttpSession httpSession, @PathVariable int blogId) {
+        if (StringUtils.isNotBlank(comment.getContent())) {
+            /*构建评论*/
+            User me = (User) httpSession.getAttribute("user");
+            userService.checkMuted(me);
+            comment.setUser(me);
+            comment.setTime(ToolsUtil.getNowTimeString());
+            Blog blog = new Blog();
+            blog.setId(blogId);
+            comment.setBlog(blog);
+            commentService.addComment(comment);
+        }
+        /*添加评论*/
+        return "redirect:/user/detail.html/" + blogId;
+    }
+
+    /**
+     * 删除评论
+     *
+     * @return 成功则转到微博详情，否则转到错误提示页面
+     */
+    @GetMapping("user/delComment/{commentId}")
+    public String delComment(HttpSession httpSession, @PathVariable int commentId) {
+        Comment comment = commentService.backCommentById(commentId);
+        User me = (User) httpSession.getAttribute("user");
+        User someone = comment.getUser();
+        User blogger = comment.getBlog().getUser();
+        if (me.equals(someone) || me.getAdmin() > someone.getAdmin() ||
+                me.equals(blogger) || me.getAdmin() > blogger.getAdmin()) {
+
+            commentService.delComment(commentId);
+        }
+        return "redirect:/user/detail.html/" + comment.getBlog().getId();
+    }
+
+    /**
+     * 编辑评论
+     *
+     * @return 成功则转到微博详情，否则转到错误提示页面
+     */
+    @PostMapping("user/editComment")
+    public String editComment(Comment comment, HttpSession httpSession) {
+        Comment oldComment = commentService.backCommentById(comment.getId());
+        User me = (User) httpSession.getAttribute("user");
+        userService.checkMuted(me);
+        if (StringUtils.isNotEmpty(comment.getContent()) && me.equals(oldComment.getUser())) {
+            commentService.updateComment(comment);
+        }
+        return "redirect:/user/detail.html/" + oldComment.getBlog().getId();
+    }
+}
+```
+
+相关SQL语句
+
+```xml
+<update id="updateComment" parameterType="com.arvinclub.model.entity.Comment"  useGeneratedKeys="true" keyProperty="id">
+    update comment
+    set comment_content = #{content}
+    where comment_id = #{id}
+</update>
+<delete id="delComment" parameterType="int">
+    DELETE FROM comment
+    WHERE comment_id = #{id}
+</delete>
+
+<select id="backCommentById" resultMap="commentMap" parameterType="int">
+    SELECT comment_id, comment_content, comment_time, user_id, status, blog_id
+    FROM comment
+    WHERE comment_id = #{id}
+      AND status = 1
+    ORDER BY comment_id
+</select>
+
+<select id="backCommentByBlogId" resultMap="commentMap" parameterType="int">
+    SELECT comment_id, comment_content, comment_time, user_id, status, blog_id
+    FROM comment
+    WHERE blog_id = #{id}
+      AND status = 1
+    ORDER BY comment_id
+</select>
+
+<insert id="addComment">
+    INSERT INTO comment(blog_id, user_id, comment_content, comment_time)
+    VALUES (#{blog}, #{user}, #{content}, #{time})
+</insert>
+
+
+<resultMap id="commentMap" type="com.arvinclub.model.entity.Comment">
+    <id column="comment_id" property="id" jdbcType="INTEGER"/>
+    <result column="comment_content" property="content" jdbcType="VARCHAR" javaType="string"/>
+    <result column="comment_time" property="date" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+    <result column="status" property="status" jdbcType="INTEGER" javaType="int"/>
+    <association property="user" select="com.arvinclub.service.dao.UserDao.backUserById" column="user_id"/>
+    <association property="blog" select="com.arvinclub.service.dao.BlogDao.backBlogsById" column="blog_id"/>
+</resultMap>
+```
+
+
+
+
+
 ### 8. 多人聊天
 
 -  用户可以在多人聊天室参与聊天，所有进入聊天室的用户都可以实时看到聊天内容。
 
+利用了java.util.concurrent包下的并发容器ConcurrentHashMap，和保证原子性的int包装类AtomicInteger，每有一个用户连接，则在在线用户集合：clients:ConcurrentHashMap<String, WebSocket>中添加一个用户信息，包含了用户名与会话。同时同步更新在线人数：onlineCount:AtomicInteger
+
+当用户发送消息时，服务端会接收到消息，并转发给当前登录的所有用户，期间对每个用户单独加锁，既保证了每个用户的会话的同步，又保证了并发性能
+
+用户断开连接时，在线用户集合：clients:ConcurrentHashMap<String, WebSocket>和在线人数：onlineCount:AtomicInteger也会同步更新
+
+为了保证系统的高可用
+
+```java
+/**
+ * 基于WebSocket的多人聊天室
+ */
+@ServerEndpoint(value = "/webSocketByTomcat", configurator = GetHttpSessionConfigurator.class)
+public class WebSocket {
+    /**
+     * 聊天室人数
+     */
+    private static final AtomicInteger onlineCount = new AtomicInteger(0);
+
+    /**
+     * 当前聊天室成员
+     */
+    private static final Map<String, WebSocket> clients = new ConcurrentHashMap<>();
+
+    /**
+     * 用户信息
+     */
+    private Session session;
+    private String username;
+    private final Object lock = new Object();
+
+    /**
+     * 新建连接
+     */
+    @OnOpen
+    public void onOpen(Session session, EndpointConfig config) throws Exception {
+        //获取HttpSession，并得到用户名
+        HttpSession httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        username = ((User) httpSession.getAttribute("user")).getName();
+
+        //登录冲突提醒
+        if (clients.containsKey(username)) {
+            //language=HTML
+            clients.get(username).sendMessageToMe("<span style=\"color:blue\">你已在其他位置登陆</span>");
+            clients.get(username).session.close();
+        }
+
+        //该用户进入聊天室
+        this.session = session;
+        clients.put(username, this);
+
+        //聊天室人数调整，并通知其他用户
+        onlineCount.set(clients.size());
+        //language=HTML
+        sendMessageAll("<span style=\"color:green\">[" + username + "] 进入聊天室, 当前人数: " + getOnlineCount() + "</span>");
+
+
+    }
+
+    /**
+     * 关闭连接
+     */
+    @OnClose
+    public void onClose() throws Exception {
+
+        clients.remove(username);
+        onlineCount.set(clients.size());
+        //language=HTML
+        sendMessageAll("<span style=\"color:red\">[" + username + "] 离开聊天室, 当前人数: " + getOnlineCount() + "</span>");
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
+
+    }
+
+    /**
+     * 处理收到的消息
+     */
+    @OnMessage
+    public void onMessage(String message) throws IOException {
+        if (message.equalsIgnoreCase("clear!!!"))
+            for (WebSocket webSocket : clients.values())
+                webSocket.session.close();
+        else if (message.equalsIgnoreCase("num!!!")) {
+            //language=HTML
+            sendMessageToMe("<span style=\"color:blue\">当前人数: " + getOnlineCount() + "</span>");
+            for (String u : clients.keySet())
+                //language=HTML
+                sendMessageToMe("<span style=\"color:blue\">[" + u + "]  </span>");
+        } else
+            sendMessageAll("[" + username + "]: " + message);
+    }
+
+    /**
+     * 出错也要保证正常关闭和注销
+     */
+    @OnError
+    public void onError(Throwable error) throws Exception {
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
+    }
+
+
+    /**
+     * 广播信息
+     */
+    private void sendMessageAll(String message) throws IOException {
+        for (WebSocket item : clients.values())
+            synchronized (item.lock) {
+                item.session.getBasicRemote().sendText(message);
+            }
+    }
+
+
+    /**
+     * 打印出提醒（单人）
+     */
+    private void sendMessageToMe(String message) throws IOException {
+        synchronized (lock) {
+            session.getBasicRemote().sendText(message);
+        }
+    }
+
+    /**
+     * 获取当前人数
+     */
+    public static int getOnlineCount() {
+        for (String str : clients.keySet())
+            if (!clients.get(str).session.isOpen())
+                clients.remove(str);
+        return onlineCount.get();
+    }
+
+}
+```
+
+为了保证服务端可以拿到用户名，需要在握手时获取HTTP会话：HttpSession（不是同一个会话），并把HTTP会话保存到WebSocket上下文的用户配置参数 UserProperties中，以便后续获取。
+
+```java
+/**
+ * 用于WebSocket连接时获取HttpSession
+ */
+public class GetHttpSessionConfigurator extends Configurator {
+
+    /**
+     * 获取HttpSession并放到UserProperties中
+     */
+    @Override
+    public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
+        HttpSession httpSession = (HttpSession) request.getHttpSession();
+        sec.getUserProperties().put(HttpSession.class.getName(), httpSession);
+    }
+}
+```
+
+
+
 ### 9. 站内搜索
 
++ 用户可以通过关键词索用户和微博内容。
+
+用HTTP会话保存用户的搜索记录，以便用户下次再进入搜索页面时，可以重现上一次搜索的结果
+
+```java
+/**
+ * 查找内容
+ */
+@Controller
+public class SearchController {
+    @Resource
+    private BlogService blogService;
+
+    /**
+     * 进入查找内容页面
+     */
+    @GetMapping("user/search.html")
+    public String search() {
+        return "search";
+    }
+
+    /**
+     * 按关键词查找内容（默认第一页）
+     */
+    @PostMapping("user/search.html")
+    public String search(@RequestParam String keyword, HttpSession session) {
+        session.setAttribute("keyword", keyword);
+        return searchByPage(1, session);
+    }
+
+    /**
+     * 按关键词查找内容（指定页号）
+     */
+    @GetMapping("user/search.html/{page}")
+    public String searchByPage(@PathVariable int page, HttpSession session) {
+        /*确认关键词*/
+        String keyword = (String) session.getAttribute("keyword");
+        if (StringUtils.isBlank(keyword))
+            return "redirect:/user/search.html";
+        /*开始查询,返回信息*/
+        session.setAttribute("blogPage", blogService.selectBlogsByKey(keyword, page));
+        return "search";
+    }
+
+}
+```
+
+相关SQL语句
+
+在SQL查询语句的拼接上，占位符使用了#{}而不是${}，#{}使用了预编译SQL语句的形式，不光有效地提升了SQL语句在重复查询上的性能，还能防止被SQL注入。
+
+```xml
+<select id="selectBlogsByKey" resultMap="blogMap" parameterType="string">
+    SELECT blog_id, blog_content, blog_time, user_id, filenames
+    FROM blogs a INNER JOIN user b USING(user_id)
+    <where>
+        a.status = 1
+        AND blog_content LIKE &quot;%&quot;#{key}&quot;%&quot;
+        OR user_name LIKE &quot;%&quot;#{key}&quot;%&quot;
+    </where>
+    ORDER BY blog_id DESC
+</select>
+```
+
+```mysql
+SELECT blog_id, blog_content, blog_time, user_id, filenames
+FROM blogs a
+INNER JOIN user b USING(user_id)
+WHERE a.status = 1 AND blog_content LIKE "%"'test'"%" OR user_name LIKE "%"'test'"%" ORDER BY blog_id DESC
+LIMIT 15;
+```
 
 
-## （五）聊天室的交互实现
-
-## （六）同步聊天室人数
 
 
 
